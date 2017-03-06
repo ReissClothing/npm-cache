@@ -11,7 +11,7 @@ var logger = require('./util/logger');
 var ParseUtils = require('./util/parseUtils');
 var CacheDependencyManager = require('./cacheDependencyManagers/cacheDependencyManager');
 
-// Main entry point for npm-cache
+// Main entry point for package-cache
 var main = function () {
   // Parse CLI Args
   parser.command('install')
@@ -69,15 +69,15 @@ var main = function () {
 
   var examples = [
     'Examples:',
-    '\tnpm-cache install\t# try to install npm, bower, and composer components',
-    '\tnpm-cache install bower\t# install only bower components',
-    '\tnpm-cache install bower npm\t# install bower and npm components',
-    '\tnpm-cache install bower --allow-root composer --dry-run\t# install bower with allow-root, and composer with --dry-run',
-    '\tnpm-cache install --cacheDirectory /home/cache/ bower \t# install components using /home/cache as cache directory',
-    '\tnpm-cache install --forceRefresh  bower\t# force installing dependencies from package manager without cache',
-    '\tnpm-cache install --noArchive npm\t# do not compress/archive the cached dependencies',
-    '\tnpm-cache clean\t# cleans out all cached files in cache directory',
-    '\tnpm-cache hash\t# reports the current working hash'
+    '\tpackage-cache install\t# try to install npm, bower, and composer components',
+    '\tpackage-cache install bower\t# install only bower components',
+    '\tpackage-cache install bower npm\t# install bower and npm components',
+    '\tpackage-cache install bower --allow-root composer --dry-run\t# install bower with allow-root, and composer with --dry-run',
+    '\tpackage-cache install --cacheDirectory /home/cache/ bower \t# install components using /home/cache as cache directory',
+    '\tpackage-cache install --forceRefresh  bower\t# force installing dependencies from package manager without cache',
+    '\tpackage-cache install --noArchive npm\t# do not compress/archive the cached dependencies',
+    '\tpackage-cache clean\t# cleans out all cached files in cache directory',
+    '\tpackage-cache hash\t# reports the current working hash'
   ];
   parser.help(examples.join('\n'));
 
@@ -95,7 +95,7 @@ var prepareCacheDirectory = function (cacheDirectory) {
   }
 };
 
-// npm-cache command handlers
+// package-cache command handlers
 
 // main method for installing specified dependencies
 var installDependencies = function (opts) {

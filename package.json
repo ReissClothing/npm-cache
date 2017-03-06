@@ -1,11 +1,11 @@
 {
-  "name": "npm-cache",
-  "version": "0.6.5",
+  "name": "package-cache",
+  "version": "0.6.5+reiss.20170306",
   "description": "cache dependency manager installs to local machine",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/swarajban/npm-cache.git"
+    "url": "git://github.com/ReissClothing/package-cache.git"
   },
   "keywords": [
     "npm",
@@ -14,6 +14,7 @@
     "bower",
     "jspm",
     "composer",
+    "yarn",
     "local"
   ],
   "author": "swaraj",
@@ -21,13 +22,17 @@
     {
       "name": "Aaron Nordyke",
       "email": "aaron.nordyke@gmail.com"
+    },
+    {
+      "name": "Adam Elsodaney",
+      "email": "reissdevelopers@gmail.com"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/swarajban/npm-cache/issues"
+    "url": "https://github.com/ReissClothing/package-cache/issues"
   },
-  "homepage": "https://github.com/swarajban/npm-cache",
+  "homepage": "https://github.com/ReissClothing/package-cache",
   "dependencies": {
     "async": "1.5.0",
     "fs-extra": "^0.26.2",
@@ -43,6 +48,6 @@
   },
   "preferGlobal": true,
   "bin": {
-    "npm-cache": "index.js"
+    "package-cache": "index.js"
   }
 }

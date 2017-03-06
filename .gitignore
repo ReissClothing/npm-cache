@@ -5,7 +5,7 @@ node_modules
 
 # IntelliJ Project Files
 .idea/
-npm-cache.iml
+package-cache.iml
 
 
 # Tmp Directory

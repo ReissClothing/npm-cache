@@ -25,7 +25,7 @@ var getAbsolutePath = function (relativePath) {
 };
 
 var getFileBackupPath = function (installedDirectory) {
-  return path.join(installedDirectory, '.npm-cache');
+  return path.join(installedDirectory, '.package-cache');
 };
 
 var getFileBackupFilename = function (file) {
@@ -251,7 +251,7 @@ CacheDependencyManager.prototype.loadDependencies = function (callback) {
 };
 
 /**
- * only return 'composer', 'npm' and 'bower' thereby `npm-cache install` doesn't change behavior if managers are added
+ * only return 'composer', 'npm' and 'bower' thereby `package-cache install` doesn't change behavior if managers are added
  *
  * @returns {Object} availableDefaultManagers
  */
@@ -265,8 +265,8 @@ CacheDependencyManager.getAvailableDefaultManagers = function() {
  * and absolute paths to configs as values
  *
  * Ex: {
- *  npm: /usr/local/lib/node_modules/npm-cache/cacheDependencyMangers/npmConfig.js,
- *  bower: /usr/local/lib/node_modules/npm-cache/cacheDependencyMangers/bowerConfig.js
+ *  npm: /usr/local/lib/node_modules/package-cache/cacheDependencyMangers/npmConfig.js,
+ *  bower: /usr/local/lib/node_modules/package-cache/cacheDependencyMangers/bowerConfig.js
  * }
  *
  * @return {Object} availableManagers

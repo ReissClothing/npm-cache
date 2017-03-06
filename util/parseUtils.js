@@ -5,10 +5,10 @@ var CacheDependencyManager = require('../cacheDependencyManagers/cacheDependency
 
 /**
  * Returns an array of strings containing command line arguments
- * for npm-cache. Excludes any arguments to be passed to package
+ * for package-cache. Excludes any arguments to be passed to package
  * managers
  *
- * Ex: npm-cache --forceRefresh --cacheDirectory /tmp bower --allow-root
+ * Ex: package-cache --forceRefresh --cacheDirectory /tmp bower --allow-root
  *  Returns [--forceRefresh, --cacheDirectory, /tmp]
  *
  * @return {string[]} args
@@ -36,7 +36,7 @@ exports.getNpmCacheArgs = function () {
  * Parses command line args and returns an object specifying which managers
  * were requested along with their command line arguments
  *
- * Ex: npm-cache install bower --allow-root --save npm --save
+ * Ex: package-cache install bower --allow-root --save npm --save
  *  Returns {bower: '--allow-root --save', npm: --save}
  *
  * @return {Object} managerArgs
