@@ -47,6 +47,7 @@ var main = function () {
     abbr: 'c',
     help: 'directory where dependencies will be cached'
   });
+
   parser.option('noArchive', {
     abbr: 'd',
     help: 'when installing a new dependency set, those dependencies will be stored uncompressed. This requires more disk space but notably increases performance',
@@ -66,6 +67,12 @@ var main = function () {
     }
   });
 
+  parser.option('keepItems', {
+    default: null,
+    abbr: 'n',
+    full: 'keep-items',
+    help: 'keep a certain number of cache installations to save disk space'
+  });
 
   var examples = [
     'Examples:',
@@ -112,6 +119,7 @@ var installDependencies = function (opts) {
       managerConfig.cacheDirectory = opts.cacheDirectory;
       managerConfig.forceRefresh = opts.forceRefresh;
       managerConfig.noArchive = opts.noArchive;
+      managerConfig.keepItems = opts.keepItems;
       managerConfig.installOptions = managerArguments[managerName];
       var manager = new CacheDependencyManager(managerConfig);
       manager.loadDependencies(callback);
