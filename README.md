@@ -1,7 +1,8 @@
 package-cache
 =========
 
-`package-cache` is a command line utility that caches dependencies installed via `yarn`, ``npm`, `bower`, `jspm` and `composer`.
+`package-cache` is a command line utility that caches dependencies installed via `yarn`, `npm`, `bower`, `jspm`
+and `composer`.
 
 It is useful for build processes that run `[yarn|npm|bower|composer|jspm] install` every time as part of their
 build process. Since dependencies don't change often, this often means slower build times. `package-cache`
@@ -47,9 +48,3 @@ package-cache install --forceRefresh  bower	# force installing dependencies from
 package-cache install --noArchive  npm	# installs dependencies and caches them without compressing
 package-cache clean	# cleans out all cached files in cache directory
 ```
-
-## Contributing
-Though I have a busy day job, I will do my best to add simple feature requests and
-merge PRs as soon as I can. I know this package is not following many of today's best
-practices (namely TESTS, a proper branching strategy, and more), but I hope you still
-find it useful.

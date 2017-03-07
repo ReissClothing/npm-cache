@@ -7,4 +7,3 @@ exports.logError = function (errorMessage) {
 exports.logInfo = function (message) {
   console.log('[package-cache] [INFO] ' + message);
 };
-
