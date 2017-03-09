@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('lodash');
+var _ = require('underscore');
 var CacheDependencyManager = require('../cacheDependencyManagers/cacheDependencyManager');
 
 /**
@@ -48,7 +48,7 @@ exports.getManagerArgs = function () {
   var currManager = null;
 
   // First determine which managers were requested by looking at command line arguments
-  _.forEach(
+  _.each(
     allArguments,
     function addManagerArgument (argument) {
       if (argument in availableManagers) {
@@ -63,7 +63,7 @@ exports.getManagerArgs = function () {
   // If no managers were specified, try installing everything by default!
   if (_.isEmpty(managers)) {
     // add all keys from available managers as keys here
-    _.forEach(
+    _.each(
       CacheDependencyManager.getAvailableDefaultManagers(),
       function addManager (managerPath, manager) {
         managers[manager] = '';

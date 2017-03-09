@@ -9,8 +9,9 @@ var tar = require('tar-fs');
 var fstream = require('fstream');
 var md5 = require('md5');
 var tmp = require('tmp');
-var _ = require('lodash');
+var _ = require('underscore');
 var zlib = require('zlib');
+var rimraf = require('rimraf');
 
 var cacheVersion = '1';
 
@@ -118,8 +119,36 @@ CacheDependencyManager.prototype.archiveDependencies = function (cacheDirectory,
     }
     fs.renameSync(tmpName, cachePath);
     self.cacheLogInfo('installed and archived dependencies');
+
     onFinally();
+
+    if (true !== self.config.noArchive && null !== self.config.keepItems) {
+      purgeOldCacheItems(cacheDirectory, self.config.keepItems);
+    }
+
     callback();
+  }
+
+  /**
+   * @param {string} directory
+   * @param {int}    keepCount
+   */
+  function purgeOldCacheItems(directory, keepCount) {
+    var snapshots = _.map(fs.readdirSync(directory), function (fileName) {
+      return path.join(directory, fileName);
+    });
+
+    var timeline = _.sortBy(snapshots, function (filePath) {
+      return fs.statSync(filePath)['ctime'];
+    });
+
+    var snapshotsToRemove = _.initial(timeline, keepCount);
+
+    _.each(snapshotsToRemove, function (oldSnapshot) {
+        rimraf.sync(oldSnapshot);
+    });
+
+    self.cacheLogInfo('removed ' + snapshotsToRemove.length + ' file(s) from cache directory');
   }
 
   function onFinally() {
@@ -242,7 +271,8 @@ CacheDependencyManager.prototype.loadDependencies = function (callback) {
 
     // Try to archive newly installed dependencies
     var cachePathWithInstalledDirectory = path.resolve(cachePathNotArchived, this.config.installDirectory);
-      this.archiveDependencies(
+
+    this.archiveDependencies(
       this.config.noArchive ? cachePathNotArchived : cacheDirectory,
       this.config.noArchive ? cachePathWithInstalledDirectory : cachePathArchive,
       callback
