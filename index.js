@@ -1,8 +1,9 @@
 #! /usr/bin/env node
 'use strict';
 
-var fs = require('fs-extra');
+var fs = require('fs');
 var path = require('path');
+var shell = require('shelljs');
 var parser = require('nomnom');
 var async = require('async');
 var glob = require('glob');
@@ -13,6 +14,8 @@ var CacheDependencyManager = require('./cacheDependencyManagers/cacheDependencyM
 
 // Main entry point for package-cache
 var main = function () {
+  checkTarExists();
+
   // Parse CLI Args
   parser.command('install')
     .callback(installDependencies)
@@ -28,22 +31,8 @@ var main = function () {
     .callback(cleanCache)
     .help('clear cache directory');
 
-  parser.command('hash')
-    .callback(reportHash)
-    .help('reports the current working hash');
-
-  var defaultCacheDirectory = process.env.NPM_CACHE_DIR;
-  if (defaultCacheDirectory === undefined) {
-    var homeDirectory = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-    if (homeDirectory !== undefined) {
-      defaultCacheDirectory = path.resolve(homeDirectory, '.package_cache');
-    } else {
-      defaultCacheDirectory = path.resolve('/tmp', '.package_cache');
-    }
-  }
-
   parser.option('cacheDirectory', {
-    default: defaultCacheDirectory,
+    default: path.resolve(process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE, '.package_cache'),
     abbr: 'c',
     help: 'directory where dependencies will be cached'
   });
@@ -77,7 +66,6 @@ var main = function () {
     '\tpackage-cache install --cacheDirectory /home/cache/ bower \t# install components using /home/cache as cache directory',
     '\tpackage-cache install --forceRefresh  bower\t# force installing dependencies from package manager without cache',
     '\tpackage-cache clean\t# cleans out all cached files in cache directory',
-    '\tpackage-cache hash\t# reports the current working hash'
   ];
   parser.help(examples.join('\n'));
 
@@ -85,12 +73,20 @@ var main = function () {
   parser.parse(npmCacheArgs);
 };
 
+// Verify system 'tar' command, exit if if it doesn't exist
+var checkTarExists = function () {
+  if (! shell.which('tar')) {
+    logger.logError('tar command-line tool not found. exiting...');
+    process.exit(1);
+  }
+};
+
 // Creates cache directory if it does not exist yet
 var prepareCacheDirectory = function (cacheDirectory) {
   logger.logInfo('using ' + cacheDirectory + ' as cache directory');
   if (! fs.existsSync(cacheDirectory)) {
     // create directory if it doesn't exist
-    fs.mkdirsSync(cacheDirectory);
+    shell.mkdir('-p', cacheDirectory);
     logger.logInfo('creating cache directory');
   }
 };
@@ -117,35 +113,13 @@ var installDependencies = function (opts) {
       manager.loadDependencies(callback);
     },
     function onInstalled (error) {
-      if (error === null) {
+      if (error === undefined) {
         logger.logInfo('successfully installed all dependencies');
         process.exit(0);
       } else {
         logger.logError('error installing dependencies');
         process.exit(1);
       }
-    }
-  );
-};
-
-var reportHash = function (opts) {
-  var availableManagers = CacheDependencyManager.getAvailableManagers();
-  var managerArguments = ParseUtils.getManagerArgs();
-  var managers = Object.keys(managerArguments);
-
-  if (managers.length > 1) {
-    logger.logError('can only calculate hash for one dependency manager at a time');
-    process.exit(1);
-  }
-
-  async.each(
-    managers,
-    function calculateHash (managerName) {
-      var managerConfig = require(availableManagers[managerName]);
-      managerConfig.cacheDirectory = opts.cacheDirectory;
-
-      var hash = managerConfig.getFileHash(managerConfig.configPath);
-      console.log(hash);
     }
   );
 };
