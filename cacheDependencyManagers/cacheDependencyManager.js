@@ -186,7 +186,6 @@ CacheDependencyManager.prototype.restoreCachedDependencies = function (cachePath
 
   function onError(error) {
     self.cacheLogError('Error restoring ' + cachePath + ': ' + error);
-    callback(error);
   }
   function onEnd() {
     if (self.config.addToArchiveAndRestore) {
@@ -194,7 +193,6 @@ CacheDependencyManager.prototype.restoreCachedDependencies = function (cachePath
       fs.removeSync(fileBackupDirectory);
     }
     self.cacheLogInfo('done extracting');
-    callback();
   }
 
   var extractor = tar.Extract({path: targetPath})
