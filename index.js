@@ -5,7 +5,7 @@ var fs = require('fs-extra');
 var path = require('path');
 var parser = require('nomnom');
 var async = require('async');
-var rimraf = require('rimraf');
+var glob = require('glob');
 
 var logger = require('./util/logger');
 var ParseUtils = require('./util/parseUtils');
@@ -48,12 +48,6 @@ var main = function () {
     help: 'directory where dependencies will be cached'
   });
 
-  parser.option('noArchive', {
-    abbr: 'd',
-    help: 'when installing a new dependency set, those dependencies will be stored uncompressed. This requires more disk space but notably increases performance',
-    flag: true
-  });
-
   parser.option('version', {
     abbr: 'v',
     help: 'displays version info and exit',
@@ -82,7 +76,6 @@ var main = function () {
     '\tpackage-cache install bower --allow-root composer --dry-run\t# install bower with allow-root, and composer with --dry-run',
     '\tpackage-cache install --cacheDirectory /home/cache/ bower \t# install components using /home/cache as cache directory',
     '\tpackage-cache install --forceRefresh  bower\t# force installing dependencies from package manager without cache',
-    '\tpackage-cache install --noArchive npm\t# do not compress/archive the cached dependencies',
     '\tpackage-cache clean\t# cleans out all cached files in cache directory',
     '\tpackage-cache hash\t# reports the current working hash'
   ];
@@ -118,7 +111,6 @@ var installDependencies = function (opts) {
       var managerConfig = require(availableManagers[managerName]);
       managerConfig.cacheDirectory = opts.cacheDirectory;
       managerConfig.forceRefresh = opts.forceRefresh;
-      managerConfig.noArchive = opts.noArchive;
       managerConfig.keepItems = opts.keepItems;
       managerConfig.installOptions = managerArguments[managerName];
       var manager = new CacheDependencyManager(managerConfig);
@@ -158,48 +150,26 @@ var reportHash = function (opts) {
   );
 };
 
-
-// Recursively lists files in directory up to maxDepth
-var cachedFileListHelper = function (dir, fileList, regex, currDepth, maxDepth) {
-  if (currDepth === maxDepth) {
-    return fileList;
-  }
-
-  var dirFiles = fs.readdirSync(dir);
-  dirFiles.forEach(
-    function (file) {
-      var filePath = path.join(dir, file);
-      if (regex.test(filePath)) {
-        fileList.push(filePath);
-      }
-
-      if (fs.statSync(filePath).isDirectory()) {
-        cachedFileListHelper(filePath, fileList, regex, currDepth + 1, maxDepth);
-      }
-    }
-  );
-  return fileList;
-};
-
-// Returns list of candidate cached files
-var getCachedFileList = function (baseDir) {
-  var cacheRegex = /[0-9a-f]{32}[\.tar\.gz]*$/i;
-  return cachedFileListHelper(baseDir, [], cacheRegex, 0, 3);
-};
-
 // Removes all cached dependencies from cache directory
 var cleanCache = function (opts) {
   prepareCacheDirectory(opts.cacheDirectory);
 
-  var cachedFileList = getCachedFileList(opts.cacheDirectory);
-  cachedFileList.forEach(
-    function (filePath) {
-      rimraf.sync(filePath);
-      // fs.unlinkSync(filePath);
+  // Get all *.tar.gz files recursively in cache directory
+  var candidateFileNames = glob.sync(opts.cacheDirectory + '/**/*.tar.gz');
+
+  // Filter out unlikely npm-cached files (non-md5 file names)
+  var md5Regexp = /\/[0-9a-f]{32}\.tar\.gz/i;
+  var cachedFiles = candidateFileNames.filter(
+    function isCachedFile (fileName) {
+      return md5Regexp.test(fileName);
     }
   );
 
-  logger.logInfo('cleaned ' + cachedFileList.length + ' files from cache directory');
+  // Now delete all cached files!
+  cachedFiles.forEach(function (fileName) {
+    fs.unlinkSync(fileName);
+  });
+  logger.logInfo('cleaned ' + cachedFiles.length + ' files from cache directory');
 };
 
 
